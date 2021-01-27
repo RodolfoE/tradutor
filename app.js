@@ -1,5 +1,11 @@
-const frase = `Obtem os {projetos} em que todas as {acoes} já foram Concluida, Arquivada ou Cancelada, e envia um e-mail ao {responsavel}, pedindo para que ele conclua o(s) {projeto}(s) manualmente
-`
+const output = (sigla, frase) => console.log(`${sigla.toUpperCase()}: ${frase}` );
+const outputXml = (tagName, frase, caminho) => console.log(`
+    <data name="${tagName}" xml:space="preserve">
+        <value>${frase}</value>
+    </data>
+${caminho}
+`);
+
 const translatte = require('translatte');
 
 const traduzir = async (frase, lingu) => {
@@ -21,16 +27,44 @@ const inserirTermos = (terms, fras) => {
     return fras;
 }
 
-const traduzirParaAsLinguagens = (arrDeIdiom) => {
-    let palavrasEmCouchete = obterTermos(frase);
-    arrDeIdiom.forEach(async lingu => {
-        const fraseTraduzida = await traduzir(frase, lingu);
-        const fraseTraduzidaComTermos = inserirTermos(palavrasEmCouchete, fraseTraduzida);
-        output(lingu, fraseTraduzidaComTermos);
-    })       
+const obterTradESigla = async (lingu, frase, palavrasEmCouchete) => {
+    const fraseTraduzida = await traduzir(frase, lingu);
+    const fraseTraduzidaComTermos = inserirTermos(palavrasEmCouchete, fraseTraduzida);
+    return {lingu, fraseTraduzidaComTermos};
 }
 
-const output = (lingu, frase) => console.log(`${lingu.toUpperCase()}: ${frase}\n` );
+const obterTraducaoESigla = async (frase, arrDeIdiom) => {
+    let palavrasEmCouchete = obterTermos(frase);
+    let traducaoESigla = [];
+    for (let i = 0; i < arrDeIdiom.length; i++) {
+        const lingu = arrDeIdiom[i];
+        traducaoESigla.push(await obterTradESigla(lingu, frase, palavrasEmCouchete));
+    }
+    return traducaoESigla;
+}
 
-output('pt', frase);
-traduzirParaAsLinguagens(['en', 'fr', 'it', 'nl', 'de', 'es']);
+const interfaceTraduzEExibe = async (tagEfrase, caminho, formatoExibicao) => {
+    let traducoes = await obterTraducaoESigla(tagEfrase['frase'], caminho.map(x => x.id));    
+    console.log(`#####   ${tagEfrase['tagName']}   ######`)
+    for (let i = 0; i < traducoes.length; i++) {
+        const e = traducoes[i];   
+        switch(formatoExibicao){
+            case 'xml':
+                outputXml(tagEfrase['tagName'], e['fraseTraduzidaComTermos'], caminho.find(y => y.id == e['lingu']).path);
+                break;
+            case 'txt':
+                output(e['lingu'], e['fraseTraduzidaComTermos'])
+                break;
+        }            
+    }
+    console.log('\n');
+}
+const caminho = require('./caminho');
+const tagEfrase = require('./tagEfrase');
+
+tagEfrase.forEach(x => {
+    if (['xml', 'txt'].filter(x => x == process.argv[2]).length)
+        interfaceTraduzEExibe(x, caminho, process.argv[2])
+    else 
+        interfaceTraduzEExibe(x, caminho, 'xml');
+});
