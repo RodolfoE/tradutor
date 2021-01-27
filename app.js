@@ -1,3 +1,4 @@
+const translatte = require('translatte');
 const output = (sigla, frase) => console.log(`${sigla.toUpperCase()}: ${frase}` );
 const outputXml = (tagName, frase, caminho) => console.log(`
     <data name="${tagName}" xml:space="preserve">
@@ -5,8 +6,6 @@ const outputXml = (tagName, frase, caminho) => console.log(`
     </data>
 ${caminho}
 `);
-
-const translatte = require('translatte');
 
 const traduzir = async (frase, lingu) => {
     try{
@@ -20,9 +19,9 @@ const traduzir = async (frase, lingu) => {
 
 const obterTermos = (frase) => frase.match(/{(.*?)\}/g).map(x => x.replace('{', '').replace('}', ''));
 const inserirTermos = (terms, fras) => {
-    fras = fras.replace(/{(.*?)\}/g, `@9@1`);
+    fras = fras.replace(/{(.*?)\}/g, `@#9%1`);
     terms.forEach(termo => {
-        fras = fras.replace('@9@1', `{${termo}}`);
+        fras = fras.replace('@#9%1', `{${termo}}`);
     })
     return fras;
 }
@@ -60,7 +59,7 @@ const interfaceTraduzEExibe = async (tagEfrase, caminho, formatoExibicao) => {
     console.log('\n');
 }
 const caminho = require('./caminho');
-const tagEfrase = require('./tagEfrase');
+const tagEfrase = require('./tags');
 
 tagEfrase.forEach(x => {
     if (['xml', 'txt'].filter(x => x == process.argv[2]).length)
