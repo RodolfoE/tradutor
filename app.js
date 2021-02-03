@@ -13,11 +13,12 @@ const traduzir = async (frase, lingu) => {
         return text;        
     } catch (err){
         console.error(err);
-        return '';
+        return 'ERRO NA TRADUÇÂO: ' + err.message;
     }
 }
 
 const obterTermos = (frase) => frase.match(/{(.*?)\}/g).map(x => x.replace('{', '').replace('}', ''));
+
 const inserirTermos = (terms, fras) => {
     fras = fras.replace(/{(.*?)\}/g, `@#9%1`);
     terms.forEach(termo => {
@@ -58,12 +59,14 @@ const interfaceTraduzEExibe = async (tagEfrase, caminho, formatoExibicao) => {
     }
     console.log('\n');
 }
-const caminho = require('./caminho');
-const tagEfrase = require('./tags');
 
-tagEfrase.forEach(x => {
-    if (['xml', 'txt'].filter(x => x == process.argv[2]).length)
-        interfaceTraduzEExibe(x, caminho, process.argv[2])
-    else 
-        interfaceTraduzEExibe(x, caminho, 'xml');
-});
+(() => {
+    const caminho = require('./caminho');
+    const tagEfrase = require('./tags');
+    tagEfrase.forEach(x => {
+        if (['xml', 'txt'].filter(x => x == process.argv[2]).length)
+            interfaceTraduzEExibe(x, caminho, process.argv[2])
+        else 
+            interfaceTraduzEExibe(x, caminho, 'xml');
+    });
+})();
