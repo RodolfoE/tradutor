@@ -17,11 +17,11 @@ const traduzir = async (frase, lingu) => {
     }
 }
 
-const obterTermos = (frase) => frase.match(/{(.*?)\}/g).map(x => x.replace('{', '').replace('}', ''));
+const obterTermos = (frase) => frase.match(/{(.*?)\}/g) && frase.match(/{(.*?)\}/g).map(x => x.replace('{', '').replace('}', ''));
 
 const inserirTermos = (terms, fras) => {
     fras = fras.replace(/{(.*?)\}/g, `@#9%1`);
-    terms.forEach(termo => {
+    terms && terms.forEach(termo => {
         fras = fras.replace('@#9%1', `{${termo}}`);
     })
     return fras;
