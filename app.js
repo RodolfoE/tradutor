@@ -8,13 +8,15 @@ ${caminho}
 `);
 
 const traduzir = async (frase, lingu) => {
-    try{
-        const {text} = await translatte(frase, { from: 'pt', to: lingu});
-        return text;        
-    } catch (err){
-        console.error(err);
-        return 'ERRO NA TRADUÇÂO: ' + err.message;
-    }
+    for (let tentativa = 0; tentativa < 3; tentativa++) 
+        try{
+            const {text} = await translatte(frase, { from: 'pt', to: lingu});
+            return text;        
+        } catch (err){
+            console.error(err);
+            if (tentativa === 2)
+                return 'ERRO NA TRADUÇÂO: ' + err.message;
+        }
 }
 
 const obterTermos = (frase) => frase.match(/{(.*?)\}/g) && frase.match(/{(.*?)\}/g).map(x => x.replace('{', '').replace('}', ''));
