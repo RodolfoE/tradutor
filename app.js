@@ -64,9 +64,41 @@ const interfaceTraduzEExibe = async (tagEfrase, caminho, formatoExibicao) => {
     const caminho = require('./caminho');
     const tagEfrase = require('./tags');
     tagEfrase.forEach(x => {
+
+        if (process.argv[2] === 'path'){
+            caminho.forEach(c => console.log(`${c.id}\n${c.path}`));
+            return;
+        }
+
         if (['xml', 'txt'].filter(x => x == process.argv[2]).length)
             interfaceTraduzEExibe(x, caminho, process.argv[2])
         else 
             interfaceTraduzEExibe(x, caminho, 'xml');
     });
+});
+
+(() => {
+	const caminho = require('./caminho');
+	const readline = require("readline");
+	const rl = readline.createInterface({
+		input: process.stdin,
+		output: process.stdout
+	});
+	
+	if ('txt' === process.argv[2])
+		rl.question("Phrase to be translated? ", async function(frase) {
+			await interfaceTraduzEExibe({tagName: '', frase}, caminho, 'txt');
+			rl.close();
+		});
+	else 
+		rl.question("Tag name? ", function(tagName) {
+			rl.question("Phrase to be translated? ", async function(frase) {
+				await interfaceTraduzEExibe({tagName, frase}, caminho, 'xml');
+				rl.close();
+			});
+		});
+
+	rl.on("close", function() {
+		process.exit(0);
+	});
 })();

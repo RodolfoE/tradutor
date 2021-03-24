@@ -1,8 +1,8 @@
-let baseUrl = 'C://Users//rodol//Documents//Projetos';
+let baseUrl = "C://Users//rodol//Documents//Projetos";
 module.exports = [
     {
         id: 'pt',
-        path: baseUrl + '//fonte//Stratec.Internationalization.Core//Resources//Utils.ResourceUtils.pt-BR.resx'
+        path: `'${baseUrl}//fonte//Stratec.Internationalization.Core//Resources//Utils.ResourceUtils.pt-BR.resx'`
     },{
         id: 'en',
         path: baseUrl + '//fonte//Stratec.Internationalization.Core//Resources//Utils.ResourceUtils.en.resx'

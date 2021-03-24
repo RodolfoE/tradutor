@@ -1,6 +1,6 @@
 module.exports = [
     {
-        tagName: 'tipoAcessoImportacao',
-        frase: `4 - Alteração para todos os centros de Custo.`
+        tagName: 'propriedadesWidgetRevisoesPontoControle',
+        frase: `Propriedades widget revisões de {pontodecontrole}`
     }
 ];
