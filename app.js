@@ -88,13 +88,13 @@ const interfaceTraduzEExibe = async (tagEfrase, caminho, formatoExibicao) => {
 	});
 	
 	if ('txt' === process.argv[2])
-		rl.question("Phrase to be translated? ", async function(frase) {
+		rl.question("Frase a ser traduzida? ", async function(frase) {
 			await interfaceTraduzEExibe({tagName: '', frase}, caminho, 'txt');
 			rl.close();
 		});
 	else 
-		rl.question("Tag name? ", function(tagName) {
-			rl.question("Phrase to be translated? ", async function(frase) {
+		rl.question("Nome da Tag? ", function(tagName) {
+			rl.question("Frase a ser traduzida? ", async function(frase) {
 				await interfaceTraduzEExibe({tagName, frase}, caminho, 'xml');
 				rl.close();
 			});
