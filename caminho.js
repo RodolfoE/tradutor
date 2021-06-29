@@ -1,4 +1,4 @@
-let baseUrl = "C://Users//rodol//Documents//Projetos";
+let baseUrl = "";
 module.exports = [
     {
         id: 'pt',

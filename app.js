@@ -1,9 +1,9 @@
 const translatte = require('translatte');
 const output = (sigla, frase) => console.log(`${sigla.toUpperCase()}: ${frase}` );
 const outputXml = (tagName, frase, caminho) => console.log(`
-    <data name="${tagName}" xml:space="preserve">
-        <value>${frase}</value>
-    </data>
+<data name="${tagName}" xml:space="preserve">
+    <value>${frase}</value>
+</data>
 ${caminho}
 `);
 
@@ -45,14 +45,18 @@ const obterTraducaoESigla = async (frase, arrDeIdiom) => {
     return traducaoESigla;
 }
 
-const interfaceTraduzEExibe = async (tagEfrase, caminho, formatoExibicao) => {
-    let traducoes = await obterTraducaoESigla(tagEfrase['frase'], caminho.map(x => x.id));    
+const interfaceTraduzEExibe = async (tagEfrase, caminho, formatoExibicao, frasesJaTraduzidas) => {
+    let traducoes = await obterTraducaoESigla(tagEfrase['frase'], caminho
+    .filter(x => !frasesJaTraduzidas || frasesJaTraduzidas.filter(({sigla}) => sigla.toUpperCase() === x.id.toUpperCase()).length === 0)
+    .map(x => x.id));
+    frasesJaTraduzidas && frasesJaTraduzidas.forEach(({sigla, fraseJaTraduzida}) => traducoes.push({lingu: sigla, fraseTraduzidaComTermos: fraseJaTraduzida}));
+
     console.log(`#####   ${tagEfrase['tagName']}   ######`)
     for (let i = 0; i < traducoes.length; i++) {
         const e = traducoes[i];   
         switch(formatoExibicao){
             case 'xml':
-                outputXml(tagEfrase['tagName'], e['fraseTraduzidaComTermos'], caminho.find(y => y.id == e['lingu']).path);
+                outputXml(tagEfrase['tagName'], e['fraseTraduzidaComTermos'], caminho.find(y => y.id.toUpperCase() == e['lingu'].toUpperCase()).path);
                 break;
             case 'txt':
                 output(e['lingu'], e['fraseTraduzidaComTermos'])
@@ -87,17 +91,37 @@ const interfaceTraduzEExibe = async (tagEfrase, caminho, formatoExibicao) => {
 		output: process.stdout
 	});
 	
-	if ('txt' === process.argv[2])
+    if (process.argv[2] === 'path'){
+        caminho.forEach(c => console.log(`${c.id}\n${c.path}`));
+        return;
+    } else if ('txt' === process.argv[2])
 		rl.question("Frase a ser traduzida? ", async function(frase) {
 			await interfaceTraduzEExibe({tagName: '', frase}, caminho, 'txt');
 			rl.close();
 		});
 	else 
 		rl.question("Nome da Tag? ", function(tagName) {
-			rl.question("Frase a ser traduzida? ", async function(frase) {
-				await interfaceTraduzEExibe({tagName, frase}, caminho, 'xml');
-				rl.close();
-			});
+            const frasesIdiomaJaTraduzido = [];
+			const funcFraseJaTraduzida = () =>
+                rl.question("Algum idioma já traduzido? [n] para sair (obs: comece com sigla e ':', ex: EN:) ", function(frase) {
+				    if (frase !== 'n'){
+                        if (!frase.includes(':')){
+                            console.log('Formato incorreto');
+                            funcFraseJaTraduzida();
+                        }
+                            
+                        const sigla = frase.split(':')[0];
+                        const fraseJaTraduzida = frase.split(':')[1];
+                        frasesIdiomaJaTraduzido.push({sigla, fraseJaTraduzida});  
+                        funcFraseJaTraduzida();
+                    }
+                    rl.question("Frase a ser traduzida? ", async function(frase) {
+                        await interfaceTraduzEExibe({tagName, frase}, caminho, 'xml', frasesIdiomaJaTraduzido);
+                        rl.close();
+                    });
+			    });
+            funcFraseJaTraduzida();
+            
 		});
 
 	rl.on("close", function() {
