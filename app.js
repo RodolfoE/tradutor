@@ -92,7 +92,7 @@ const interfaceTraduzEExibe = async (tagEfrase, caminho, formatoExibicao, frases
 	});
 	
     if (process.argv[2] === 'path'){
-        caminho.forEach(c => console.log(`${c.id}\n${c.path}`));
+        caminho.forEach(c => console.log(`${c.id} | ${c.path}`));
         return;
     } else if ('txt' === process.argv[2])
 		rl.question("Frase a ser traduzida? ", async function(frase) {
@@ -103,7 +103,7 @@ const interfaceTraduzEExibe = async (tagEfrase, caminho, formatoExibicao, frases
 		rl.question("Nome da Tag? ", function(tagName) {
             const frasesIdiomaJaTraduzido = [];
 			const funcFraseJaTraduzida = () =>
-                rl.question("Algum idioma já traduzido? [n] para sair (obs: comece com sigla e ':', ex: EN:) ", function(frase) {
+                rl.question("Algum idioma já traduzido? [n] para sair (obs: comece com sigla e ':', ex: EN: frase já traduzida) ", function(frase) {
 				    if (frase !== 'n'){
                         if (!frase.includes(':')){
                             console.log('Formato incorreto');
