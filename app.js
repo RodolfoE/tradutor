@@ -1,11 +1,31 @@
 const translatte = require('translatte');
+var fs = require('fs');
+
 const output = (sigla, frase) => console.log(`${sigla.toUpperCase()}: ${frase}` );
-const outputXml = (tagName, frase, caminho) => console.log(`
-<data name="${tagName}" xml:space="preserve">
-    <value>${frase}</value>
-</data>
-${caminho}
-`);
+const outputXml = (tagName, frase, caminho) => {
+    try{
+        InserirNoFinalDoArquivo(caminho, tagName, frase);
+    } catch (err){   
+        let newTag = `
+        <data name="${tagName}" xml:space="preserve">
+            <value>${frase}</value>
+        </data>`;
+        console.log(`${newTag} \n ${caminho}`);
+    }
+}
+
+const InserirNoFinalDoArquivo = async (caminho, tagName, frase) => {
+    let newTag = `\t<data name="${tagName}" xml:space="preserve">\n\t\t<value>${frase}</value>\n\t</data>`;
+    if (!fs.existsSync(caminho)){
+        console.log('Arquivo caminho.js não configurado, ou configurado de maneira incorreta.')
+        throw 'Error'
+    } 
+    const data = fs.readFileSync(caminho, {encoding:'utf8', flag:'r'});
+    let valorAserAlterado = data.slice(0, data.indexOf('</root>'));
+    valorAserAlterado = valorAserAlterado + newTag;
+    valorAserAlterado = valorAserAlterado + '\n</root>';        
+    fs.writeFileSync(caminho, valorAserAlterado);
+}
 
 const traduzir = async (frase, lingu) => {
     for (let tentativa = 0; tentativa < 3; tentativa++) 
@@ -128,3 +148,5 @@ const interfaceTraduzEExibe = async (tagEfrase, caminho, formatoExibicao, frases
 		process.exit(0);
 	});
 })();
+
+//InserirNoFinalDoArquivo('C:/Users/RODOLFO/Documents/Projetos//fonte//Stratec.Internationalization.Core//Resources//Utils.ResourceUtils.pt-BR.resx', 'bla', 'alkdjsadf');
